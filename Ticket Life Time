@@ -1,0 +1,7 @@
+Attribute VB_Name = "lifetime"
+Sub ticket_life_time()
+WriteToSheet (RemoveDuplicate(ReadFromFile("request"), 2, 5, 6, 7, 8))
+WriteToSheet (RemoveDuplicate(ReadFromFile("incident"), 2, 5, 9, 8, 6))
+WriteToSheet (RemoveDuplicate(ReadFromFile("oss task"), 2, 5, 6, 7, 8))
+WriteToSheet (RemoveDuplicate(ReadFromFile("prtal task"), 2, 3, 7, 8, 9))
+End Sub
