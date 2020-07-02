@@ -1,0 +1,124 @@
+Attribute VB_Name = "Fuctions"
+Public Function ReadFromFile(ByVal str As String) As Variant
+Dim sheet(), profiles(), temp(), id() As Variant
+Dim row_numbers, col_numbers As Integer
+row_numbers = Sheets("Profile").Cells(Rows.count, 1).End(xlUp).Row
+ReDim profiles(row_numbers)
+For i = 2 To row_numbers
+    profiles(i) = Sheets("Profile").Cells(i, 1).value
+Next i
+MsgBox ("Please select " & str & " data")
+filetoopen = Application.GetOpenFilename()
+Workbooks.Open Filename:=filetoopen
+row_numbers = Cells(Rows.count, 1).End(xlUp).Row
+col_numbers = Cells(1, Columns.count).End(xlToLeft).Column
+ReDim sheet(row_numbers, col_numbers)
+r = 1
+For i = 1 To row_numbers
+    str = Cells(i, 2).value
+    If IsInArray(str, profiles) <> -1 Then
+        For j = 1 To col_numbers
+            sheet(r, j) = Cells(i, j).value
+            Next j
+        r = r + 1
+    End If
+Next i
+ActiveWindow.Close
+ReadFromFile = sheet
+End Function
+
+
+Function IsInArray(stringToBeFound As String, arr As Variant) As Long
+Dim i As Long
+For i = LBound(arr) To UBound(arr)
+    If StrComp(stringToBeFound, arr(i), vbTextCompare) = 0 Then
+        IsInArray = i
+        Exit Function
+    End If
+Next i
+IsInArray = -1
+End Function
+
+
+Public Function RemoveDuplicate(arr As Variant, group_pos As Integer, flow_pos As Integer, wait_time_pos As Integer, age_pos As Integer, check_time As Integer) As Variant
+Dim id_pos As Integer
+Dim temp(), temp1(), output() As Variant
+ReDim temp(LBound(arr, 1) To UBound(arr, 1))
+For j = 1 To 1
+    For i = LBound(arr, 1) To UBound(arr, 1)
+        temp(i) = arr(i, j)
+    Next
+Next
+id = ArrayUnique(temp)
+ReDim temp1(LBound(arr, 1) To UBound(arr, 1))
+For j = check_time To check_time
+    For i = LBound(arr, 1) To UBound(arr, 1)
+        temp1(i) = arr(i, j)
+    Next
+Next
+ReDim output(UBound(id), 10)
+For i = LBound(id) To UBound(id)
+    id_pos = GetIndex(temp, id(i))
+    output(i, 1) = id(i)
+    output(i, 2) = arr(id_pos, group_pos)
+    output(i, 3) = arr(id_pos, flow_pos)
+    output(i, 4) = arr(id_pos, wait_time_pos)
+    output(i, 5) = arr(id_pos, age_pos)
+    output(i, 6) = SumIf(temp, id(i), temp1)
+Next i
+RemoveDuplicate = output
+End Function
+
+
+Function ArrayUnique(ByVal aArrayIn As Variant) As Variant
+Dim aArrayOut() As Variant
+Dim bFlag As Boolean
+Dim vIn As Variant
+Dim vOut As Variant
+Dim i%, j%, k%
+ReDim aArrayOut(LBound(aArrayIn) To UBound(aArrayIn))
+i = LBound(aArrayIn)
+j = i
+For Each vIn In aArrayIn
+    For k = j To i - 1
+        If vIn = aArrayOut(k) Then bFlag = True: Exit For
+    Next
+        If Not bFlag Then aArrayOut(i) = vIn: i = i + 1
+            bFlag = False
+Next
+    If i <> UBound(aArrayIn) Then ReDim Preserve aArrayOut(LBound(aArrayIn) To i - 1)
+ArrayUnique = aArrayOut
+End Function
+
+
+Public Function GetIndex(ByRef iaList() As Variant, ByVal value As Variant) As Long
+Dim i As Long
+For i = LBound(iaList) To UBound(iaList)
+    If value = iaList(i) Then
+        GetIndex = i
+        Exit For
+    End If
+Next i
+End Function
+
+
+Public Function WriteToSheet(arr As Variant)
+row_num = Sheets("Data").Cells(Rows.count, 1).End(xlUp).Row
+For i = LBound(arr) + 1 To UBound(arr)
+    For j = 1 To 6
+        Sheets("Data").Cells(i + row_num, j).value = arr(i, j)
+    Next j
+Next i
+End Function
+
+
+Public Function SumIf(ByRef lookuparray() As Variant, ByVal lookupValue As String, ByRef sumarray() As Variant) As Double
+Dim i As Long
+On Error Resume Next
+SumIf = 0
+For i = LBound(lookuparray) To UBound(lookuparray)
+    If lookuparray(i) = lookupValue Then
+        SumIf = SumIf + sumarray(i)
+    End If
+Next i
+End Function
