@@ -1,0 +1,806 @@
+
+
+Private neg_pnt As Double
+
+Sub ola_comput()
+
+Dim vt_Profiles(1 To 120)
+Dim vt_emails(1 To 120)
+Dim vt_CC(1 To 120)
+
+Dim vt_prtal_profile(1 To 120)
+Dim vt_oss_profile(1 To 120)
+
+Dim vt_req_id(1 To 265000)
+Dim vt_req_group(1 To 265000)
+Dim vt_req_flow(1 To 265000)
+Dim vt_req_status(1 To 265000)
+Dim vt_req_time(1 To 265000)
+
+Dim vt_inc_id(1 To 265000)
+Dim vt_inc_group(1 To 265000)
+Dim vt_inc_flow(1 To 265000)
+Dim vt_inc_status(1 To 265000)
+Dim vt_inc_time(1 To 265000)
+
+Dim vt_otsk_id(1 To 265000)
+Dim vt_otsk_group(1 To 265000)
+Dim vt_otsk_flow(1 To 265000)
+Dim vt_otsk_status(1 To 265000)
+Dim vt_otsk_time(1 To 265000)
+
+Dim vt_ptsk_id(1 To 265000)
+Dim vt_ptsk_group(1 To 265000)
+Dim vt_ptsk_flow(1 To 265000)
+Dim vt_ptsk_status(1 To 265000)
+Dim vt_ptsk_time(1 To 265000)
+
+Dim arr(1 To 265000)
+Dim arr1(1 To 265000)
+
+Dim oss_req(1 To 10000)
+Dim oss_inc(1 To 10000)
+Dim oss_task(1 To 10000)
+Dim portal_task(1 To 10000)
+
+Dim not_comput() As Variant
+Dim Archive_id() As Variant
+
+Dim cont_req As Integer
+Dim cont_inc As Integer
+Dim cont_otsk As Integer
+Dim cont_ptsk As Integer
+
+Dim req_id As String
+Dim inc_id As String
+Dim otsk_id As String
+Dim ptsk_id As String
+
+Dim number As Integer
+Dim str As String
+    
+    For i = 1 To Sheets("Archive").Cells(Rows.count, 1).End(xlUp).Row
+        oss_req(i) = Sheets("Archive").Cells(i, 1)
+    Next i
+    For i = 1 To Sheets("Archive").Cells(Rows.count, 2).End(xlUp).Row
+        oss_inc(i) = Sheets("Archive").Cells(i, 2)
+    Next i
+    For i = 1 To Sheets("Archive").Cells(Rows.count, 3).End(xlUp).Row
+        oss_task(i) = Sheets("Archive").Cells(i, 3)
+    Next i
+    For i = 1 To Sheets("Archive").Cells(Rows.count, 4).End(xlUp).Row
+        portal_task(i) = Sheets("Archive").Cells(i, 4)
+    Next i
+    
+    end_row = Sheets("Archive").Cells(Rows.count, 5).End(xlUp).Row
+    ReDim not_comput(end_row)
+        For i = 1 To end_row
+        not_comput(i) = Sheets("Archive").Cells(i, 5)
+    Next i
+    
+        end_row = Sheets("Archive").Cells(Rows.count, 1).End(xlUp).Row
+    ReDim Archive_id(end_row)
+        For i = 1 To end_row
+        Archive_id(i) = Sheets("Archive").Cells(i, 1)
+    Next i
+
+    For i = 2 To 102
+        vt_Profiles(i) = Sheets("Profiles").Cells(i, 1)
+    Next
+    For i = 2 To 102
+        vt_emails(i) = Sheets("Profiles").Cells(i, 2)
+    Next
+    For i = 2 To 102
+        vt_CC(i) = Sheets("Profiles").Cells(i, 3)
+    Next
+    For i = 2 To 115
+        vt_prtal_profile(i) = Sheets("Profiles").Cells(i, 10)
+    Next
+    For i = 2 To 115
+        vt_oss_profile(i) = Sheets("Profiles").Cells(i, 9)
+    Next
+
+clean
+
+Holiday = 0
+''********** copy requst data to virtual table ******************************************************
+
+
+MsgBox ("Please select Request data")
+filetoopen = Application.GetOpenFilename()
+Workbooks.Open Filename:=filetoopen
+cont_req = 2
+  For i = 1 To Cells(Rows.count, 1).End(xlUp).Row
+  str = Cells(i, 2).value
+  If IsInArray(str, vt_Profiles) <> -1 Then
+  str = Cells(i, 1).value
+  If search(not_comput, str) = 0 Then
+  str = Cells(i, 3).value
+  If IsInArray(str, vt_Profiles) <> -1 Then
+  vt_req_id(cont_req) = Cells(i, 1)
+  vt_req_group(cont_req) = Cells(i, 3)
+  vt_req_flow(cont_req) = Cells(i, 5)
+  vt_req_status(cont_req) = Cells(i, 4)
+  vt_req_time(cont_req) = Cells(i, 9) - Holiday
+  cont_req = cont_req + 1
+  End If
+  End If
+  End If
+Next
+ActiveWindow.Close
+
+'********** copy incident data to virtual table ******************************************************
+
+
+MsgBox ("Please select Incident data")
+filetoopen = Application.GetOpenFilename()
+Workbooks.Open Filename:=filetoopen
+cont_inc = 2
+  For i = 1 To Cells(Rows.count, 1).End(xlUp).Row
+  str = Cells(i, 2).value
+  If IsInArray(str, vt_Profiles) <> -1 Then
+    str = Cells(i, 1).value
+  If search(not_comput, str) = 0 Then
+  str = Cells(i, 3).value
+  If IsInArray(str, vt_Profiles) <> -1 Then
+  vt_inc_id(cont_inc) = Cells(i, 1)
+  vt_inc_group(cont_inc) = Cells(i, 3)
+  vt_inc_flow(cont_inc) = Cells(i, 5)
+  vt_inc_status(cont_inc) = Cells(i, 4)
+  vt_inc_time(cont_inc) = Cells(i, 7) - Holiday
+  cont_inc = cont_inc + 1
+  End If
+  End If
+  End If
+Next
+ActiveWindow.Close
+
+
+''********** copy oss task data to virtual table ******************************************************
+
+
+MsgBox ("Please select oss task data")
+filetoopen = Application.GetOpenFilename()
+Workbooks.Open Filename:=filetoopen
+cont_otsk = 2
+  For i = 1 To Cells(Rows.count, 1).End(xlUp).Row
+  str = Cells(i, 2).value
+  If IsInArray(str, vt_Profiles) <> -1 Then
+    str = Cells(i, 1).value
+  If search(not_comput, str) = 0 Then
+  str = Cells(i, 3).value
+  If IsInArray(str, vt_Profiles) <> -1 Then
+  vt_otsk_id(cont_otsk) = Cells(i, 1)
+  vt_otsk_group(cont_otsk) = Cells(i, 3)
+  vt_otsk_flow(cont_otsk) = Cells(i, 5)
+  vt_otsk_status(cont_otsk) = Cells(i, 4)
+  vt_otsk_time(cont_otsk) = Cells(i, 9) - Holiday
+  cont_otsk = cont_otsk + 1
+  End If
+  End If
+  End If
+Next
+ActiveWindow.Close
+
+''********** copy portal task data to virtual table ******************************************************
+
+
+MsgBox ("Please select portal task data")
+filetoopen = Application.GetOpenFilename()
+Workbooks.Open Filename:=filetoopen
+cont_ptsk = 2
+For i = 1 To Cells(Rows.count, 1).End(xlUp).Row
+arr(i) = Cells(i, 5).value
+Next i
+For i = 1 To Cells(Rows.count, 1).End(xlUp).Row
+arr1(i) = Cells(i, 3).value
+Next i
+  For i = 1 To Cells(Rows.count, 1).End(xlUp).Row
+    str = arr1(i)
+    If IsInArray(str, vt_prtal_profile) <> -1 Then
+      str = Cells(i, 1).value
+  If search(not_comput, str) = 0 Then
+    str = arr(i)
+    If IsInArray(str, vt_prtal_profile) <> -1 Then
+        x = search(vt_prtal_profile, arr(i))
+        str = vt_oss_profile(x)
+        If IsInArray(str, vt_Profiles) <> -1 Then
+            vt_ptsk_id(cont_ptsk) = Cells(i, 1)
+            vt_ptsk_group(cont_ptsk) = str
+            vt_ptsk_flow(cont_ptsk) = Cells(i, 4)
+            vt_ptsk_status(cont_ptsk) = Cells(i, 6)
+            vt_ptsk_time(cont_ptsk) = Cells(i, 10) - Holiday
+        cont_ptsk = cont_ptsk + 1
+        End If
+    End If
+    End If
+    End If
+Next
+
+ActiveWindow.Close
+
+'********** comput ******************************************************
+'Call format
+    Columns("a:a").Select
+    Selection.NumberFormat = "0"
+    Columns("B:B").Select
+    Selection.NumberFormat = "0"
+    Columns("I:I").Select
+    Selection.NumberFormat = "0"
+    Columns("h:h").Select
+    Selection.NumberFormat = "0"
+    Range("E:F,L:M").Select
+    Selection.NumberFormat = "[h]:mm:ss"
+
+
+For i = 2 To 102
+    neg_pnt = Sheets("Profiles").Cells(i, 3)
+    str = vt_Profiles(i)
+    number = comput(9, cont_req, "oss_req", str, vt_req_id, vt_req_group, vt_req_flow, vt_req_status, vt_req_time, Archive_id, "A", "F", 0, 1, "OSS Requests")
+    number = comput(number + 6, cont_inc, "oss_inc", str, vt_inc_id, vt_inc_group, vt_inc_flow, vt_inc_status, vt_inc_time, Archive_id, "A", "F", 0, 1, "OSS Incidents")
+    number = comput(9, cont_otsk, "oss_otsk", str, vt_otsk_id, vt_otsk_group, vt_otsk_flow, vt_otsk_status, vt_otsk_time, Archive_id, "H", "M", 7, 1, "OSS Tasks")
+    number = comput(number + 6, cont_ptsk, "oss_ptsk", str, vt_ptsk_id, vt_ptsk_group, vt_ptsk_flow, vt_ptsk_status, vt_ptsk_time, Archive_id, "H", "M", 7, 1, "Portal Tasks")
+    Call name(str)
+   ' Call format
+    If Cells(Sheets("report").Rows.count, 1).End(xlUp).Row >= Cells(Sheets("report").Rows.count, 10).End(xlUp).Row Then
+        number = Cells(Sheets("report").Rows.count, 1).End(xlUp).Row
+    End If
+   Call point(number)
+    Range("A1:M" & number + 5).Select
+    ActiveSheet.PageSetup.PrintArea = "$A$1:$M$" & number + 5
+    Blank_cell = Sheets("report").Cells(200, 200).value
+    If Sheets("report").Cells(9, 1).value <> Blank_cell Or Sheets("report").Cells(15, 1).value <> Blank_cell Or Sheets("report").Cells(9, 8).value <> Blank_cell Or Sheets("report").Cells(15, 8).value <> Blank_cell Then
+    Call savePDF(str)
+ Call sendEmail(str, vt_emails(i), "")
+    End If
+Sheets("Profiles").Cells(i, 3) = neg_pnt
+    clean
+Next i
+
+
+
+
+    number = list_all(9, cont_req, "oss_req", vt_req_id, vt_req_group, vt_req_flow, vt_req_status, vt_req_time, Archive_id, "A", "F", 0, 1, "OSS Requests")
+    number = list_all(number + 6, cont_inc, "oss_inc", vt_inc_id, vt_inc_group, vt_inc_flow, vt_inc_status, vt_inc_time, Archive_id, "A", "F", 0, 1, "OSS Incidents")
+    number = list_all(number + 6, cont_otsk, "oss_otsk", vt_otsk_id, vt_otsk_group, vt_otsk_flow, vt_otsk_status, vt_otsk_time, Archive_id, "A", "F", 0, 1, "OSS Tasks")
+    number = list_all(number + 6, cont_ptsk, "oss_ptsk", vt_ptsk_id, vt_ptsk_group, vt_ptsk_flow, vt_ptsk_status, vt_ptsk_time, Archive_id, "A", "F", 0, 1, "Portal Tasks")
+
+    Call name("همه")
+    Call savePDF("List_all")
+
+
+
+End Sub
+
+Public Function sendEmail(ByVal name As String, ByVal email As String, ByVal cc As String)
+Dim TempFilePath As String
+Dim xOutApp As Object
+Dim xOutMail As Object
+Dim xHTMLBody As String
+Dim main_text As String
+Dim Header As String
+
+    Header = Sheets("Email").Cells(1, 1).value
+    main_text = Sheets("Email").Cells(2, 1).value
+    Set xOutApp = CreateObject("outlook.application")
+    Set xOutMail = xOutApp.CreateItem(olMailItem)
+    TempFilePath = Environ$("temp") & "\"
+    xHTMLBody = "<span LANG=FA>" _
+      & "<p class=MsoNormal dir=RTL SIZE=2>" _
+   & "<font face=""B Nazanin"" color=""#385723"" SIZE=4>" & " <b> عامل پشتيبان محترم " & "</font>" & "<br/>" _
+   & "<font face=""B Nazanin"" color=""#385723"" SIZE=4>" & " <b>  با سلام و احترام " & "</font>" & "</p>" _
+    & "<p dir=RTL >" _
+   & "<font face=""B Nazanin"" color=""#385723""SIZE=2>" & " <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" & Header & " </font>" & "<p class=MsoNormal dir=RTL SIZE=2>" _
+      & "<font face=""B Nazanin"" color=""#385723""SIZE=2>" & " <b>" & main_text & " </font>" & "<p class=MsoNormal dir=RTL SIZE=2>" _
+   & "<font face=""B Nazanin"" color=""#385723"" SIZE=4>" & " <b>  با سپاس " & "</font>" & "<br/>" _
+   & "<font face=""B Nazanin"" color=""#385723"" SIZE=4>" & " <b>  مديريت عاملين پشتيبان " & "</font>" & "<br/>" _
+   & "<font face=""B Nazanin"" color=""#385723"" SIZE=4>" & " <b>  شرکت انتقال داده هاي آسياتک (سهامي عام) " & "</font>" & "<br/>" _
+   & "<p dir=RTL><img src=""C:\Users\mo.jalali\Desktop\AT.JPG"">" & "<br/>" _
+   & "<font face=""B Nazanin"" color=""#385723"" SIZE=4>" & " <b>  برترين اپراتور ارتباطات ثابت کشور " & "</font>" & "<br/>" _
+   & "<font face=""B Nazanin"" color=""#385723"" SIZE=4>" & " <b>  تلفن: 1544- (شماره داخلي: 1820)" & "</font>" & "<br/>" _
+                & "<br></font></span>"
+    With xOutMail
+            .SentOnBehalfOfName = "supportagents.notification@asiatech.ir"
+            .HTMLBody = xHTMLBody
+            .Subject = "" & name & ""
+            .To = email
+            .cc = "mo.jalali@asiatech.ir;" & cc
+            .bcc = "SupportAgents@asiatech.ir"
+            .Display
+            .Attachments.Add ("C:\Users\mo.jalali\Desktop\pdfs\" & name & ".pdf")
+            .Send
+        End With
+
+End Function
+
+Function comput(ByVal start As String, ByVal count As Integer, ByVal table_name As String, ByVal support_name As String, ByRef id() As Variant, ByRef group() As Variant, ByRef flow() As Variant, ByRef status() As Variant, ByRef time() As Variant, ByRef archive() As Variant, ByVal col_start As String, ByVal col_end As String, ByVal col_num As Integer, ByVal Arch_loc As Integer, Header As String) As Integer
+Dim pos_id, pos_flow
+Dim unique_array() As Variant
+Dim vt_Profiles(1 To 120)
+Dim vt_flow_time() As Variant
+Dim vt_flow_name() As Variant
+Dim ticket_id As String
+Dim location As Integer
+    
+j = start
+unique_array() = ArrayUnique(id)
+    
+    For i = 2 To 117
+        vt_Profiles(i) = Sheets("Profiles").Cells(i, 1)
+    Next
+    
+    end_row = Sheets("Profiles").Cells(Rows.count, 5).End(xlUp).Row
+    ReDim vt_flow_time(end_row)
+    For i = 1 To end_row
+        vt_flow_time(i) = Sheets("Profiles").Cells(i, 5)
+    Next
+    
+    end_row = Sheets("Profiles").Cells(Rows.count, 6).End(xlUp).Row
+    ReDim vt_flow_name(end_row)
+    For i = 1 To end_row
+        vt_flow_name(i) = Sheets("Profiles").Cells(i, 6)
+    Next
+  
+    For i = LBound(unique_array) To UBound(unique_array)
+        pos_id = GetIndex(id, unique_array(i))
+        pos_flow = GetIndex(vt_flow_name, flow(pos_id))
+            If group(pos_id) = support_name Then
+                ola = vt_flow_time(pos_flow)
+                If ola = "" Then
+                ola = 3
+                End If
+                If SumIf(id, id(pos_id), time) > ola Then
+                ticket_id = unique_array(i)
+                If countif(archive, unique_array(i)) > 1 Then
+                neg_pnt = neg_pnt + 0.5
+                End If
+                cnt = "*"
+                ola = "---"
+                If search(vt_flow_name, flow(pos_id)) > 0 Then
+                cnt = countif(archive, unique_array(i))
+                ola = vt_flow_time(pos_flow)
+                End If
+                        Sheets("report").Cells(j, 1 + col_num).value = cnt
+                        Sheets("report").Cells(j, 2 + col_num).value = unique_array(i)
+                        Sheets("report").Cells(j, 3 + col_num).value = flow(pos_id)
+                        Sheets("report").Cells(j, 4 + col_num).value = status(pos_id)
+                        Sheets("report").Cells(j, 5 + col_num) = SumIf(id, id(pos_id), time)
+                        Sheets("report").Cells(j, 6 + col_num) = ola
+                        If search(vt_flow_name, flow(pos_id)) > 0 Then
+                        x = Sheets("Archive").Cells(Rows.count, Arch_loc).End(xlUp).Row
+                        Sheets("Archive").Cells(x + 1, Arch_loc).value = unique_array(i)
+                         Sheets("Archive").Cells(x + 1, Arch_loc + 1).value = support_name
+                         Sheets("Archive").Cells(x + 1, Arch_loc + 2).value = table_name
+                          Sheets("Archive").Cells(x + 1, Arch_loc + 3).value = flow(pos_id)
+                        End If
+                        j = j + 1
+                End If
+            End If
+    Next
+    
+    
+    comput = j
+    ActiveSheet.ListObjects.Add(xlSrcRange, Range("$" & col_start & "$" & start - 1 & ":$" & col_end & "$" & j - 1), , xlYes).name = table_name
+    ActiveSheet.ListObjects(table_name).TableStyle = "TableStyleLight11"
+    ActiveSheet.ListObjects(table_name).ShowAutoFilterDropDown = False
+    Range(table_name & "[[#Headers],[Column1]]").Select
+    ActiveCell.FormulaR1C1 = "مرتبه اطلاع"
+    Range(table_name & "[[#Headers],[Column2]]").Select
+    ActiveCell.FormulaR1C1 = "شناسه"
+    Range(table_name & "[[#Headers],[Column3]]").Select
+    ActiveCell.FormulaR1C1 = "جريانکاري"
+    Range(table_name & "[[#Headers],[Column4]]").Select
+    ActiveCell.FormulaR1C1 = "وضعيت"
+    Range(table_name & "[[#Headers],[Column5]]").Select
+    ActiveCell.FormulaR1C1 = "مدت زمان بررسي"
+    Range(table_name & "[[#Headers],[Column6]]").Select
+    ActiveCell.FormulaR1C1 = "مدت زمان مجاز"
+    Range(col_start & start - 3 & ":" & col_end & start - 2).Select
+    Range(col_end & start - 3).Activate
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    Selection.Merge
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent3
+        .TintAndShade = -0.499984740745262
+        .PatternTintAndShade = 0
+    End With
+    With Selection.Font
+        .ThemeColor = xlThemeColorAccent3
+        .TintAndShade = 0.799981688894314
+    End With
+    Selection.Font.Bold = True
+    Selection.Font.Size = 11
+    Selection.value = Header
+    
+    
+    
+    
+    Range(table_name & "[[مرتبه اطلاع]:[شناسه]]").Select
+    Selection.NumberFormat = "General"
+    Range(table_name & "[[مدت زمان بررسي]:[مدت زمان مجاز]]").Select
+    Selection.NumberFormat = "[h]:mm:ss"
+    
+    
+    
+    
+    Cells.Select
+    Cells.EntireColumn.AutoFit
+    
+    rng = "I"
+    If table_name = "oss_req" Or table_name = "oss_inc" Then
+    rng = "B"
+    End If
+    
+    Call sort(table_name, rng)
+    
+    
+    
+End Function
+
+Private Function countif(ByRef arr As Variant, ByVal val As String) As Integer
+Dim x As Integer
+x = 1
+    For i = LBound(arr) To UBound(arr)
+        If val = arr(i) Then
+            x = x + 1
+        End If
+    
+    Next
+countif = x
+
+End Function
+Function format()
+Columns("B:B").Select
+    Selection.NumberFormat = "0"
+    Columns("I:I").Select
+    Selection.NumberFormat = "0"
+    Range("E:F,L:M").Select
+    Selection.NumberFormat = "[h]:mm:ss"
+End Function
+
+Private Function savePDF(ByVal name As String)
+  ChDir "C:\Users\mo.jalali\Desktop\pdfs"
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, Filename:= _
+        "C:\Users\mo.jalali\Desktop\pdfs\" & name & ".pdf", Quality:=xlQualityStandard, _
+        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
+        False
+End Function
+
+Function IsInArray(stringToBeFound As String, arr As Variant) As Long
+Dim i As Long
+    For i = LBound(arr) To UBound(arr)
+        If StrComp(stringToBeFound, arr(i), vbTextCompare) = 0 Then
+            IsInArray = i
+            Exit Function
+        End If
+    Next i
+    IsInArray = -1
+End Function
+
+Function ArrayUnique(ByVal aArrayIn As Variant) As Variant
+Dim aArrayOut() As Variant
+Dim bFlag As Boolean
+Dim vIn As Variant
+Dim vOut As Variant
+Dim i%, j%, k%
+ReDim aArrayOut(LBound(aArrayIn) To UBound(aArrayIn))
+i = LBound(aArrayIn)
+j = i
+For Each vIn In aArrayIn
+    For k = j To i - 1
+        If vIn = aArrayOut(k) Then bFlag = True: Exit For
+    Next
+    If Not bFlag Then aArrayOut(i) = vIn: i = i + 1
+        bFlag = False
+    Next
+    If i <> UBound(aArrayIn) Then ReDim Preserve aArrayOut(LBound(aArrayIn) To i - 1)
+ArrayUnique = aArrayOut
+End Function
+
+Public Function GetIndex(ByRef iaList() As Variant, ByVal value As Variant) As Long
+Dim i As Long
+    For i = LBound(iaList) To UBound(iaList)
+        If value = iaList(i) Then
+            GetIndex = i
+            Exit For
+        End If
+    Next i
+End Function
+
+Public Function GetIndex1(ByRef iaList() As Variant, ByVal value As String) As Long
+Dim i As Long
+    For i = LBound(iaList) To UBound(iaList)
+        If value = iaList(i) Then
+            GetIndex1 = i
+            Exit For
+        End If
+    Next i
+End Function
+
+Public Function SumIf(ByRef lookuparray() As Variant, ByVal lookupValue As String, ByRef sumarray() As Variant) As Double
+Dim i As Long
+        On Error Resume Next
+            SumIf = 0
+                For i = LBound(lookuparray) To UBound(lookuparray)
+                    If lookuparray(i) = lookupValue Then
+                        SumIf = SumIf + sumarray(i)
+                    End If
+                Next i
+End Function
+
+Function clean()
+Sheets("report").Select
+Cells.Select
+Selection.Delete Shift:=xlUp
+End Function
+
+Public Function name(ByVal Sup_name As String)
+
+Sheets("report").Range("A1:M3").Select
+    Range("K1").Activate
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    Selection.Merge
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent3
+        .TintAndShade = -0.499984740745262
+        .PatternTintAndShade = 0
+    End With
+    Selection.value = "گروه بررسي کننده : " & Sup_name
+    Range("A1:K3").Select
+    Selection.Font.Bold = True
+    Selection.Font.Size = 12
+    With Selection.Font
+        .ThemeColor = xlThemeColorAccent3
+        .TintAndShade = 0.799981688894314
+    End With
+End Function
+
+
+Function list_all(ByVal start As String, ByVal count As Integer, ByVal table_name As String, ByRef id() As Variant, ByRef group() As Variant, ByRef flow() As Variant, ByRef status() As Variant, ByRef time() As Variant, ByRef archive() As Variant, ByVal col_start As String, ByVal col_end As String, ByVal col_num As Integer, ByVal Arch_loc As Integer, Header As String) As Integer
+Dim pos_id, pos_flow
+Dim unique_array() As Variant
+Dim vt_Profiles(1 To 120)
+Dim vt_flow_time() As Variant
+Dim vt_flow_name() As Variant
+Dim vt_flow_operator() As Variant
+Dim vt_portal_operator() As Variant
+Dim ticket_id As String
+Dim location As Integer
+Dim rng As String
+ Dim mail As String
+j = start
+unique_array() = ArrayUnique(id)
+    
+    For i = 2 To 117
+        vt_Profiles(i) = Sheets("Profiles").Cells(i, 1)
+    Next
+    
+    end_row = Sheets("Profiles").Cells(Rows.count, 4).End(xlUp).Row
+    ReDim vt_portal_operator(end_row)
+    For i = 1 To end_row
+        vt_portal_operator(i) = Sheets("Profiles").Cells(i, 4)
+    Next
+    
+        end_row = Sheets("Profiles").Cells(Rows.count, 5).End(xlUp).Row
+    ReDim vt_flow_time(end_row)
+    For i = 1 To end_row
+        vt_flow_time(i) = Sheets("Profiles").Cells(i, 5)
+    Next
+    
+    end_row = Sheets("Profiles").Cells(Rows.count, 6).End(xlUp).Row
+    ReDim vt_flow_name(end_row)
+    For i = 1 To end_row
+        vt_flow_name(i) = Sheets("Profiles").Cells(i, 6)
+    Next
+  
+  
+  end_row = Sheets("Profiles").Cells(Rows.count, 7).End(xlUp).Row
+    ReDim vt_flow_operator(end_row)
+    For i = 1 To end_row
+        vt_flow_operator(i) = Sheets("Profiles").Cells(i, 7)
+    Next
+
+    For i = LBound(unique_array) To UBound(unique_array)
+        pos_id = GetIndex(id, unique_array(i))
+        pos_flow = GetIndex(vt_flow_name, flow(pos_id))
+        ola = vt_flow_time(pos_flow)
+            If ola = "" Then
+                ola = 3
+            End If
+                If SumIf(id, id(pos_id), time) > ola Then
+                    If countif(archive, unique_array(i)) >= 1 Then
+                    ticket_id = unique_array(i)
+                        Sheets("report").Cells(j, 2 + col_num).value = countif(archive, unique_array(i))
+                        Sheets("report").Cells(j, 3 + col_num).value = unique_array(i)
+                        Sheets("report").Cells(j, 4 + col_num).value = flow(pos_id)
+                        Sheets("report").Cells(j, 1 + col_num).value = group(pos_id)
+                        Sheets("report").Cells(j, 5 + col_num) = SumIf(id, id(pos_id), time)
+                       If flow(pos_id) = Sheets("Profiles").Cells(20, 6).value Or flow(pos_id) = Sheets("Profiles").Cells(21, 6).value Then
+                         Sheets("report").Cells(j, 6 + col_num) = vt_portal_operator(search(vt_Profiles, group(pos_id)))
+                         mail = vt_portal_operator(search(vt_Profiles, group(pos_id)))
+                       ElseIf flow(pos_id) <> Sheets("Profiles").Cells(20, 6).value Or flow(pos_id) <> Sheets("Profiles").Cells(21, 6).value Then
+                       Sheets("report").Cells(j, 6 + col_num) = vt_flow_operator(pos_flow)
+                       mail = vt_flow_operator(pos_flow)
+                       End If
+                 '      Call CreateVotingMessage(unique_array(i), mail, flow(pos_id))
+
+                        
+'                        x = Sheets("Archive").Cells(Rows.count, Arch_loc).End(xlUp).Row
+'                        Sheets("Archive").Cells(x + 1, Arch_loc).value = unique_array(i)
+                        j = j + 1
+                    End If
+                End If
+    Next
+
+
+    list_all = j
+    ActiveSheet.ListObjects.Add(xlSrcRange, Range("$" & col_start & "$" & start - 1 & ":$" & col_end & "$" & j - 1), , xlYes).name = table_name
+    ActiveSheet.ListObjects(table_name).TableStyle = "TableStyleLight11"
+    ActiveSheet.ListObjects(table_name).ShowAutoFilterDropDown = False
+    Range(table_name & "[[#Headers],[Column2]]").Select
+    ActiveCell.FormulaR1C1 = "مرتبه اطلاع"
+    Range(table_name & "[[#Headers],[Column3]]").Select
+    ActiveCell.FormulaR1C1 = "شناسه"
+    Range(table_name & "[[#Headers],[Column4]]").Select
+    ActiveCell.FormulaR1C1 = "جريانکاري"
+    Range(table_name & "[[#Headers],[Column1]]").Select
+    ActiveCell.FormulaR1C1 = "گروه بررسي کننده "
+    Range(table_name & "[[#Headers],[Column5]]").Select
+    ActiveCell.FormulaR1C1 = "مدت زمان بررسي"
+    Range(table_name & "[[#Headers],[Column6]]").Select
+    ActiveCell.FormulaR1C1 = "کارشناس"
+    Range(col_start & start - 3 & ":" & col_end & start - 2).Select
+    Range(col_end & start - 3).Activate
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    Selection.Merge
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent3
+        .TintAndShade = -0.499984740745262
+        .PatternTintAndShade = 0
+    End With
+    With Selection.Font
+        .ThemeColor = xlThemeColorAccent3
+        .TintAndShade = 0.799981688894314
+    End With
+    Selection.Font.Bold = True
+    Selection.Font.Size = 11
+    Selection.value = Header
+    
+    
+    Range(table_name & "[[مرتبه اطلاع]:[شناسه]]").Select
+    Selection.NumberFormat = "General"
+    Range(table_name & "[[مدت زمان بررسي]:[کارشناس]]").Select
+    Selection.NumberFormat = "[h]:mm:ss"
+    
+    
+    
+    
+    Cells.Select
+    Cells.EntireColumn.AutoFit
+    
+    rng = "B"
+    If table_name = "oss_req" Or table_name = "oss_inc" Then
+    rng = "B"
+    End If
+    
+    Call sort(table_name, rng)
+    
+End Function
+
+Function sort(ByVal table_name As String, ByVal rng As String)
+
+    Range(table_name & "[مدت زمان بررسي]").Select
+    ActiveWorkbook.Worksheets("Report").ListObjects(table_name).sort.SortFields. _
+        Clear
+    ActiveWorkbook.Worksheets("Report").ListObjects(table_name).sort.SortFields.Add _
+        Key:=Range(rng & ":" & rng), SortOn:=xlSortOnValues, Order:=xlDescending, _
+        DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("Report").ListObjects(table_name).sort
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    ActiveWindow.SmallScroll Down:=3
+End Function
+
+Public Function search(ByRef arr() As Variant, ByVal str As String) As Integer
+For i = LBound(arr) To UBound(arr)
+If arr(i) = str Then
+search = i
+Exit Function
+End If
+Next
+search = 0
+End Function
+
+Public Function point(ByVal rng As Integer)
+
+Sheets("report").Range("A" & rng + 1 & ":M" & rng + 3).Select
+    Range("K" & rng + 1).Activate
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .WrapText = False
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    Selection.Merge
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent3
+        .TintAndShade = -0.499984740745262
+        .PatternTintAndShade = 0
+    End With
+      Selection.value = " امتياز منفي کسر شده در اين ماه : " & neg_pnt & " معادل مبلغ   " & neg_pnt * Sheets("Profiles").Cells(1, 4).value & " ريال "
+'     Selection.value = " امتياز منفي کسر شده در اين ماه : " & neg_pnt
+    Range("A" & rng + 1 & ":M" & rng + 3).Select
+    Selection.Font.Bold = True
+    Selection.Font.Size = 12
+    With Selection.Font
+        .ThemeColor = xlThemeColorAccent3
+        .TintAndShade = 0.799981688894314
+    End With
+End Function
+
+Public Function CreateVotingMessage(ByVal subj As String, ByVal recp As String, ByVal bdy As String)
+Dim OutApp As Outlook.Application
+Dim mail As Outlook.MailItem
+Set OutApp = New Outlook.Application
+Set mail = OutApp.CreateItem(olMailItem)
+ With mail
+  .Subject = subj
+  .VotingOptions = "بسته شد;تاخير عامل پشتيبان;در حال بررسي ( امروز بسته خواهد شد );از محاسبه خارج شود (علت در توضيحات ثبت شد )"
+  .Importance = olImportanceHigh
+' Calculate a date using DateAdd or enter a specific date
+  .ExpiryTime = DateAdd("d", 1, Now) '3 days from now
+  .To = recp
+  .HTMLBody = bdy
+  .SentOnBehalfOfName = "supportagents.notification@asiatech.ir"
+  .cc = "mo.jalali@asiatech.ir"
+  .Send
+End With
+Set mail = Nothing
+End Function
