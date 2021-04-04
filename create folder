@@ -1,0 +1,15 @@
+Public Function CreateFolder(ByVal foldername As String)
+    Dim strFolderName As String
+    Dim strFolderExists As String
+   Dim FSO As New FileSystemObject
+    Path = ThisWorkbook.Path & "\"
+    strFolderName = Path & foldername
+    strFolderExists = Dir(strFolderName, vbDirectory)
+    If strFolderExists = "" Then
+        MkDir (strFolderName)
+        Else
+            Set FSO = CreateObject("Scripting.FileSystemObject")
+        FSO.DeleteFolder (strFolderName), False
+        MkDir (strFolderName)
+    End If
+End Function
