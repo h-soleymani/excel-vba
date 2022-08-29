@@ -1,0 +1,30 @@
+Sub spliter()
+    Dim list() As Variant
+    Dim num, rows_count As Integer
+    Dim path As String
+    num = Sheets("Profile").Cells(Rows.Count, 3).End(xlUp).Row
+    path = Application.ActiveWorkbook.path
+    ReDim list(num)
+    For i = 1 To num
+        list(i) = Sheets("Profile").Cells(i, 3).Value
+    Next i
+    rows_count = Sheets("Delay").Cells(Rows.Count, 1).End(xlUp).Row
+    For i = 2 To num
+        ActiveSheet.ListObjects("Table2").Range.AutoFilter Field:=6, _
+        Criteria1:=list(i)
+        Range("A1:G1").Select
+        Range(Selection, Selection.End(xlDown)).Select
+        If Application.Selection.Rows.Count <> rows_count Then
+            Selection.Copy
+            Workbooks.Add
+            ActiveSheet.Paste
+            Cells.Select
+            Cells.EntireColumn.AutoFit
+            Application.CutCopyMode = False
+            ActiveWorkbook.SaveAs Filename:=path & "\" & list(i) & ".xlsx", _
+            FileFormat:=xlOpenXMLWorkbook, _
+            CreateBackup:=False
+            ActiveWindow.Close
+        End If
+    Next
+End Sub
