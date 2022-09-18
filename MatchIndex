@@ -1,0 +1,10 @@
+Function MatchIndex(arr As Variant, indexarr As Variant) As Variant
+    Dim result As Variant
+    ReDim result(0)
+    For Each Ind In indexarr
+        result(UBound(result)) = arr(Ind)
+        new_bound = UBound(result) + 1
+        ReDim Preserve result(new_bound)
+    Next Ind
+    MatchIndex = result
+End Function
