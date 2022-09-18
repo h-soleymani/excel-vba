@@ -1,0 +1,12 @@
+Function GetIndexArray(arr As Variant, val As String) As Variant
+    Dim result As Variant
+    ReDim result(0)
+    For i = LBound(arr) To UBound(arr)
+        If arr(i) = val Then
+            new_bound = UBound(result) + 1
+            ReDim Preserve result(new_bound)
+            result(UBound(result)) = i
+        End If
+    Next i
+    GetIndexArray = result
+End Function
