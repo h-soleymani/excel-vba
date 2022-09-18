@@ -1,0 +1,11 @@
+Function TransposeArray(MyArray As Variant) As Variant
+    Dim x As Long
+    Dim maxX As Long
+    Dim tempArr As Variant
+    maxX = UBound(MyArray, 2)
+    ReDim tempArr(maxX)
+    For x = 0 To maxX
+        tempArr(x) = MyArray(0, x)
+    Next x
+    TransposeArray = tempArr
+End Function
